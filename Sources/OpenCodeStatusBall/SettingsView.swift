@@ -90,9 +90,6 @@ struct SettingsView: View {
                         .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
-                .onHover { hovering in
-                    NSCursor.shared.push(.arrow)
-                }
             }
             .frame(height: 32)
             .background(Color(NSColor.windowBackgroundColor).opacity(0.95))
@@ -126,7 +123,7 @@ struct SettingsView: View {
             .frame(maxWidth: .infinity)
         }
         .frame(width: 320, height: 180)
-        .background(NSColor.windowBackgroundColor)
+        .background(Color(NSColor.windowBackgroundColor))
     }
 }
 

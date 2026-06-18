@@ -12,6 +12,7 @@ final class FloatingBallPanel: NSPanel {
     override var canBecomeMain: Bool { false }
 
     private var hostingView: NSView?
+    private var hasSavedPosition = false
 
     init<Content: View>(rootView: Content) {
         let scale = StatusModel.shared.uiScale
@@ -58,14 +59,24 @@ final class FloatingBallPanel: NSPanel {
         contentView = hosting
         hostingView = hosting
 
-        // Park near upper-right of active screen by default.
+        // Restore saved position or default to upper-right
         if let screen = NSScreen.main {
             let visible = screen.visibleFrame
-            let origin = NSPoint(
-                x: visible.maxX - initial.width - 16,
-                y: visible.maxY - initial.height - 16
-            )
-            setFrameOrigin(origin)
+            let savedX = UserDefaults.standard.double(forKey: "ballPositionX")
+            let savedY = UserDefaults.standard.double(forKey: "ballPositionY")
+            
+            if savedX > 0 && savedY > 0 {
+                let origin = NSPoint(x: savedX, y: savedY)
+                if origin.x >= visible.minX && origin.x <= visible.maxX - initial.width &&
+                   origin.y >= visible.minY && origin.y <= visible.maxY - initial.height {
+                    setFrameOrigin(origin)
+                    hasSavedPosition = true
+                } else {
+                    setFrameOrigin(NSPoint(x: visible.maxX - initial.width - 16, y: visible.maxY - initial.height - 16))
+                }
+            } else {
+                setFrameOrigin(NSPoint(x: visible.maxX - initial.width - 16, y: visible.maxY - initial.height - 16))
+            }
         }
 
         // Initial sync after first layout pass.
@@ -74,10 +85,22 @@ final class FloatingBallPanel: NSPanel {
         }
     }
 
-    deinit {}
+    deinit {
+        // Save position before closing
+        savePosition()
+    }
 
-    /// Resize the window so contentView matches the SwiftUI fitting size,
-    /// keeping the top-right corner pinned.
+    override func close() {
+        savePosition()
+        super.close()
+    }
+
+    private func savePosition() {
+        let origin = frame.origin
+        UserDefaults.standard.set(origin.x, forKey: "ballPositionX")
+        UserDefaults.standard.set(origin.y, forKey: "ballPositionY")
+    }
+
     func resizeToFit() {
         guard let hosting = hostingView else { return }
         var target = hosting.fittingSize
@@ -99,5 +122,9 @@ final class FloatingBallPanel: NSPanel {
         )
         let newFrame = NSRect(origin: newOrigin, size: target)
         setFrame(newFrame, display: true, animate: false)
+        
+        if !hasSavedPosition {
+            savePosition()
+        }
     }
 }
