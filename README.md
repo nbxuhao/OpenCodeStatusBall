@@ -42,19 +42,63 @@ cd StatusBall
 
 This builds the release binary, installs a LaunchAgent to auto-start at login, and launches it immediately.
 
-### Wire up the opencode plugin
+### 安装 opencode 插件（配套必需）
 
-Add the plugin to your `~/.config/opencode/opencode.json`:
+StatusBall 需要配合 opencode 插件才能显示会话状态。插件通过 Unix socket 向 App 推送实时状态。
 
-```json
-{
-  "plugin": [
-    "/path/to/StatusBall/plugin/opencode-status-ball.ts"
-  ]
-}
+**方式一：全局安装（推荐）**
+
+将插件文件复制到全局插件目录，opencode 启动时自动加载：
+
+```bash
+# 复制插件到全局插件目录
+cp plugin/opencode-status-ball.ts ~/.config/opencode/plugins/
+
+# 重启 opencode
 ```
 
-Restart opencode. Dots will appear in the capsule as sessions become active.
+插件会自动加载，**无需修改 `opencode.json`**。
+
+**方式二：项目级安装**
+
+将插件复制到项目目录，仅在当前项目生效：
+
+```bash
+mkdir -p .opencode/plugins
+cp plugin/opencode-status-ball.ts .opencode/plugins/
+```
+
+**方式三：发布为 npm 包**
+
+如果你想分享给其他人使用，可以将插件发布到 npm：
+
+```bash
+# 在插件目录创建 package.json
+cd plugin
+npm init -y
+npm publish
+
+# 然后在 opencode.json 中添加：
+# {
+#   "plugin": ["opencode-status-ball"]
+# }
+```
+
+**验证安装**
+
+1. 确保 OpenCodeStatusBall App 已启动
+2. 重启 opencode
+3. 开启一个新会话，胶囊中应该出现一个灰色的 dot（idle 状态）
+4. 开始对话后变成绿色（running）
+
+**常见问题**
+
+| 问题 | 原因 | 解决方法 |
+|---|---|---|
+| 没有 dots 出现 | App 未运行 | 先启动 OpenCodeStatusBall |
+| dots 出现但无颜色变化 | 插件未正确加载 | 检查文件是否在 `~/.config/opencode/plugins/` 目录 |
+| 子 agent 卫星不显示 | 未收到子会话事件 | 确保 opencode 版本支持 `session.updated` 事件 |
+| 插件加载报错 | Bun 缓存了旧配置 | 重启 opencode（Bun 会缓存插件导入） |
 
 ### Manual run (no auto-start)
 
