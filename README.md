@@ -2,7 +2,7 @@
 
 A lightweight macOS floating indicator for [opencode](https://opencode.ai) sessions. Shows one colored dot per active session in a capsule that floats above all windows — including fullscreen apps, on every Space.
 
-![screenshot](screenshots/capsule.png)
+![screenshot](screenshots/tooltip.png)
 
 ## Status Colors
 
