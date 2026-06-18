@@ -6,76 +6,39 @@ VERSION="0.1.1"
 DMG_NAME="${APP_NAME}-${VERSION}"
 BUILD_DIR="/Users/xuhao/Documents/light/OpenCodeStatusBall/dmg_build"
 DIST_DIR="/Users/xuhao/Documents/light/OpenCodeStatusBall/dist"
-ICNS_PATH="${DIST_DIR}/AppIcon.icns"
 
-# Create DMG background with gradient
-create_dmg_background() {
-    python3 << 'PYTHON'
-import subprocess
-import os
+rm -rf "${BUILD_DIR}"
+rm -f /tmp/${DMG_NAME}.tmp.dmg
+mkdir -p "${BUILD_DIR}"
 
-# Create a gradient background image
-w, h = 640, 400
-subprocess.run([
-    'convert', '-size', f'{w}x{h}',
-    'gradient:#1a1a2e-#16213e',
-    '/tmp/dmg_background.png'
-], check=True)
-PYTHON
-}
+cp -r "${DIST_DIR}/${APP_NAME}.app" "${BUILD_DIR}/"
+ln -sf /Applications "${BUILD_DIR}/Applications"
 
-# Create icon for Applications shortcut
-create_applications_icon() {
-    # Create a symlink icon placeholder
-    ln -sf /Applications "${BUILD_DIR}/Applications" 2>/dev/null || true
-}
+sips -Z 640 400 "${DIST_DIR}/AppIcon.png" -o "${BUILD_DIR}/.background.png" 2>/dev/null || \
+cp "${DIST_DIR}/AppIcon.png" "${BUILD_DIR}/.background.png"
 
-# Build DMG
-build_dmg() {
-    # Copy files
-    cp -r "${BUILD_DIR}/${APP_NAME}.app" "${BUILD_DIR}/"
-    
-    # Create DMG
-    hdiutil create -srcfolder "${BUILD_DIR}" \
-        -volname "${DMG_NAME}" \
-        -fs HFS+ \
-        -format UDRO \
-        -imagekey zlib-level=9 \
-        -size 2m \
-        "${DIST_DIR}/${DMG_NAME}.dmg"
-    
-    echo "DMG created: ${DIST_DIR}/${DMG_NAME}.dmg"
-}
+hdiutil create -srcfolder "${BUILD_DIR}" -volname "${DMG_NAME}" -fs HFS+ -format UDRW -size 2m /tmp/${DMG_NAME}.tmp.dmg
 
-# Create final DMG with custom background
-create_final_dmg() {
-    # Create temporary DMG
-    hdiutil create -srcfolder "${BUILD_DIR}" \
-        -volname "${DMG_NAME}" \
-        -fs HFS+ \
-        -format UDRW \
-        -size 2m \
-        /tmp/${DMG_NAME}.tmp.dmg
+MOUNT_POINT=$(hdiutil attach /tmp/${DMG_NAME}.tmp.dmg -nobrowse -noautoopen 2>/dev/null | grep -o '/Volumes/[^ ]*' | head -1)
+
+if [ -z "$MOUNT_POINT" ] || [ ! -d "$MOUNT_POINT" ]; then
+    MOUNT_POINT=$(ls -d /Volumes/${DMG_NAME}* 2>/dev/null | head -1)
+fi
+
+echo "Mount point: $MOUNT_POINT"
+
+if [ -d "$MOUNT_POINT" ]; then
+    cp "${BUILD_DIR}/.background.png" "${MOUNT_POINT}/.background.png"
     
-    # Mount it
-    MOUNT_POINT=$(hdiutil attach /tmp/${DMG_NAME}.tmp.dmg -nobrowse -noautoopen | awk '{print $NF}')
-    
-    # Copy background image
-    # Create a simple gradient background using ImageMagick
-    if command -v convert &> /dev/null; then
-        convert -size 640x400 gradient:#1a1a2e-#16213e "${MOUNT_POINT}/.background.png" 2>/dev/null || true
-    fi
-    
-    # Create AppleScript for window appearance
-    osascript << EOF
+    osascript << 'EOF'
 tell application "Finder"
-    tell disk "${DMG_NAME}"
+    tell disk "OpenCodeStatusBall-0.1.1"
         open
         set current view of container window to icon view
         set toolbar visible of container window to false
         set statusbar visible of container window to false
         set bounds of container window to {400, 100, 1040, 500}
-        set position of item "${APP_NAME}.app" of container window to {160, 200}
+        set position of item "OpenCodeStatusBall.app" of container window to {160, 200}
         set position of item "Applications" of container window to {480, 200}
         close
         open
@@ -84,36 +47,13 @@ tell application "Finder"
 end tell
 EOF
     
-    # Unmount
-    hdiutil detach "$MOUNT_POINT" -quiet
-    
-    # Convert to read-only
-    hdiutil convert /tmp/${DMG_NAME}.tmp.dmg -format UDRO -imagekey zlib-level=9 -o "${DIST_DIR}/${DMG_NAME}.dmg"
-    
-    # Cleanup
-    rm -f /tmp/${DMG_NAME}.tmp.dmg
-    
-    echo "Final DMG created: ${DIST_DIR}/${DMG_NAME}.dmg"
-}
+    hdiutil detach "$MOUNT_POINT" -quiet 2>/dev/null || true
+fi
 
-# Main
-echo "Building DMG for ${APP_NAME} v${VERSION}..."
-mkdir -p "${BUILD_DIR}" "${DIST_DIR}"
+hdiutil convert /tmp/${DMG_NAME}.tmp.dmg -format UDRO -imagekey zlib-level=9 -o "${DIST_DIR}/${DMG_NAME}.dmg"
 
-# Copy app to build dir
-cp -r "${BUILD_DIR}/${APP_NAME}.app" "${BUILD_DIR}/" 2>/dev/null || true
-
-# Create Applications symlink
-ln -sf /Applications "${BUILD_DIR}/Applications" 2>/dev/null || true
-
-# Build DMG
-hdiutil create -srcfolder "${BUILD_DIR}" \
-    -volname "${DMG_NAME}" \
-    -fs HFS+ \
-    -format UDRO \
-    -imagekey zlib-level=9 \
-    -size 2m \
-    "${DIST_DIR}/${DMG_NAME}.dmg"
+rm -f /tmp/${DMG_NAME}.tmp.dmg
+rm -rf "${BUILD_DIR}"
 
 echo "✓ DMG created: ${DIST_DIR}/${DMG_NAME}.dmg"
 ls -lh "${DIST_DIR}/${DMG_NAME}.dmg"
