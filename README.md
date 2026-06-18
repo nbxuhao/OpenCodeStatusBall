@@ -8,11 +8,11 @@ A lightweight macOS floating indicator for [opencode](https://opencode.ai) sessi
 
 | Color | Meaning |
 |---|---|
-| ![#3DC284](https://via.placeholder.com/12/3DC284/000000?text=+) **Emerald** | Running — the agent is actively working (pulses) |
-| ![#9CA3AF](https://via.placeholder.com/12/9CA3AF/000000?text=+) **Gray** | Idle — session is open but not active |
-| ![#60A5FA](https://via.placeholder.com/12/60A5FA/000000?text=+) **Blue** | Waiting for a sub-agent to complete |
-| ![#F59E0B](https://via.placeholder.com/12/F59E0B/000000?text=+) **Amber** | Asking a question or waiting for permission (pulses) |
-| ![#FB7185](https://via.placeholder.com/12/FB7185/000000?text=+) **Rose** | Stopped or errored (auto-dismisses after 1.2s) |
+| 🟢 **Emerald** `#3DC284` | Running — the agent is actively working (pulses) |
+| ⚪ **Gray** `#9CA3AF` | Idle — session is open but not active |
+| 🔵 **Blue** `#60A5FA` | Waiting for a sub-agent to complete |
+| 🟡 **Amber** `#F59E0B` | Asking a question or waiting for permission (pulses) |
+| 🔴 **Rose** `#FB7185` | Stopped or errored (auto-dismisses after 1.2s) |
 
 Sessions with active sub-agents show tiny white orbiting satellites around their dot.
 
