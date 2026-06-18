@@ -32,18 +32,17 @@ final class SettingsWindowController {
         ])
 
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 320, height: 180),
-            styleMask: [.borderless, .fullSizeContentView],
+            contentRect: NSRect(x: 0, y: 0, width: 320, height: 220),
+            styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
+        window.title = "Settings"
         window.isReleasedWhenClosed = false
         window.center()
         window.contentView = windowContent
         window.level = .floating
         window.backgroundColor = NSColor.windowBackgroundColor
-        window.isMovable = true
-        window.isMovableByWindowBackground = true
 
         self.window = window
         window.makeKeyAndOrderFront(nil)

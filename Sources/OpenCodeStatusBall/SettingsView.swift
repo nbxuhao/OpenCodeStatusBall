@@ -72,58 +72,35 @@ final class SettingsModel: ObservableObject {
 
 struct SettingsView: View {
     @ObservedObject var model: SettingsModel
-    @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                Text("Settings")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.white)
-                Spacer()
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(.white.opacity(0.7))
-                        .padding(8)
-                        .background(Color.black.opacity(0.2))
-                        .clipShape(Circle())
+        Form {
+            Section {
+                HStack {
+                    Text("UI Scale")
+                    Slider(value: $model.uiScale, in: 0.5...2.0, step: 0.1)
+                    Text("\(String(format: "%.1f", model.uiScale))x")
+                        .frame(width: 40, alignment: .trailing)
                 }
-                .buttonStyle(.plain)
+                .padding(.vertical, 4)
+
+                Text("Adjusts the size of status dots and capsule. Changes apply immediately.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
-            .frame(height: 32)
-            .background(Color(NSColor.windowBackgroundColor).opacity(0.95))
 
-            Form {
-                Section {
-                    HStack {
-                        Text("UI Scale")
-                        Slider(value: $model.uiScale, in: 0.5...2.0, step: 0.1)
-                        Text("\(String(format: "%.1f", model.uiScale))x")
-                            .frame(width: 40, alignment: .trailing)
-                    }
-                    .padding(.vertical, 4)
+            Section {
+                Toggle("Start at login", isOn: $model.autoStart)
+                    .toggleStyle(.switch)
 
-                    Text("Adjusts the size of status dots and capsule. Changes apply immediately.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-
-                Section {
-                    Toggle("Start at login", isOn: $model.autoStart)
-                        .toggleStyle(.switch)
-
-                    Text("Automatically launch OpenCodeStatusBall when you log in.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                Text("Automatically launch OpenCodeStatusBall when you log in.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
-            .formStyle(.grouped)
-            .padding(20)
-            .frame(maxWidth: .infinity)
         }
-        .frame(width: 320, height: 180)
-        .background(Color(NSColor.windowBackgroundColor))
+        .formStyle(.grouped)
+        .padding(20)
+        .frame(width: 320, height: 190)
     }
 }
 
