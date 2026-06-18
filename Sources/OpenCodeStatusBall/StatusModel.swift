@@ -101,7 +101,16 @@ final class StatusModel: ObservableObject {
     /// Called on every session mutation so the AppKit window can resize.
     var onUpdate: (() -> Void)?
 
-    private init() {}
+    @Published var uiScale: Double = 1.0 {
+        didSet {
+            UserDefaults.standard.set(uiScale, forKey: "uiScale")
+            onUpdate?()
+        }
+    }
+
+    private init() {
+        self.uiScale = UserDefaults.standard.double(forKey: "uiScale") == 0 ? 1.0 : UserDefaults.standard.double(forKey: "uiScale")
+    }
 
     // MARK: - Mutations
 

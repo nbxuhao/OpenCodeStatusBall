@@ -4,22 +4,24 @@ import SwiftUI
 struct CapsuleBarView: View {
     @ObservedObject var model: StatusModel
     @State private var hoveredID: String? = nil
+    @State private var settingsController: SettingsWindowController?
 
-    private let dotSize: CGFloat = 11
-    private let dotSpacing: CGFloat = 10
-    private let hPad: CGFloat = 13
-    private let vPad: CGFloat = 8
+    private var dotSize: CGFloat { 11 * model.uiScale }
+    private var dotSpacing: CGFloat { 10 * model.uiScale }
+    private var hPad: CGFloat { 13 * model.uiScale }
+    private var vPad: CGFloat { 8 * model.uiScale }
 
     var body: some View {
         HStack(spacing: dotSpacing) {
             if model.sessions.isEmpty {
-                EmptyDot()
+                EmptyDot(uiScale: model.uiScale)
             } else {
                 ForEach(model.sessions) { session in
                     SessionDot(
                         session: session,
                         size: dotSize,
-                        isHovered: hoveredID == session.id
+                        isHovered: hoveredID == session.id,
+                        uiScale: model.uiScale
                     )
                     .onHover { entered in
                         hoveredID = entered ? session.id : (hoveredID == session.id ? nil : hoveredID)
@@ -31,7 +33,7 @@ struct CapsuleBarView: View {
                         ),
                         arrowEdge: .bottom
                     ) {
-                        TooltipContent(session: session)
+                        TooltipContent(session: session, uiScale: model.uiScale)
                     }
                 }
             }
@@ -44,7 +46,15 @@ struct CapsuleBarView: View {
         )
         .fixedSize()
         .animation(.easeOut(duration: 0.18), value: model.sessions.map(\.id))
+        .contentShape(Rectangle())
         .contextMenu {
+            Button("Settings") {
+                if settingsController == nil {
+                    settingsController = SettingsWindowController()
+                }
+                settingsController?.show()
+            }
+            Divider()
             Button("Quit OpenCodeStatusBall") {
                 NSApplication.shared.terminate(nil)
             }
@@ -53,12 +63,13 @@ struct CapsuleBarView: View {
 }
 
 private struct EmptyDot: View {
+    var uiScale: Double = 1.0
     @State private var dim = false
     var body: some View {
         Circle()
             .fill(Color.white.opacity(dim ? 0.18 : 0.42))
-            .frame(width: 7, height: 7)
-            .frame(width: 11, height: 11)
+            .frame(width: 7 * uiScale, height: 7 * uiScale)
+            .frame(width: 11 * uiScale, height: 11 * uiScale)
             .animation(.easeInOut(duration: 2.4).repeatForever(autoreverses: true), value: dim)
             .onAppear { dim = true }
     }
@@ -66,52 +77,53 @@ private struct EmptyDot: View {
 
 private struct TooltipContent: View {
     let session: SessionState
+    let uiScale: Double
     @State private var now = Date()
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 7) {
+        VStack(alignment: .leading, spacing: 4 * uiScale) {
+            HStack(spacing: 7 * uiScale) {
                 Circle()
                     .fill(session.status.color)
-                    .frame(width: 7, height: 7)
+                    .frame(width: 7 * uiScale, height: 7 * uiScale)
                 Text(session.label)
-                    .font(.system(size: 12.5, weight: .medium))
+                    .font(.system(size: 12.5 * uiScale, weight: .medium))
                     .foregroundColor(.primary)
             }
 
             Text(session.status.label)
-                .font(.system(size: 10.5))
+                .font(.system(size: 10.5 * uiScale))
                 .foregroundColor(.secondary)
 
             if let model = session.model {
                 Text(model)
-                    .font(.system(size: 10))
+                    .font(.system(size: 10 * uiScale))
                     .foregroundColor(.secondary)
             }
 
             if !session.detail.isEmpty {
                 Text(session.detail)
-                    .font(.system(size: 10))
+                    .font(.system(size: 10 * uiScale))
                     .foregroundColor(.secondary)
             }
 
             if let input = session.tokenInput, let output = session.tokenOutput {
                 Text(formatTokens(input) + " in / " + formatTokens(output) + " out")
-                    .font(.system(size: 10))
+                    .font(.system(size: 10 * uiScale))
                     .foregroundColor(.secondary)
             }
 
             if let since = session.activeSince {
                 Text("Running for \(formatDuration(now.timeIntervalSince(since)))")
-                    .font(.system(size: 10))
+                    .font(.system(size: 10 * uiScale))
                     .foregroundColor(.secondary)
                     .onReceive(timer) { t in now = t }
             }
         }
-        .padding(.horizontal, 13)
-        .padding(.vertical, 10)
-        .frame(minWidth: 150, alignment: .leading)
+        .padding(.horizontal, 13 * uiScale)
+        .padding(.vertical, 10 * uiScale)
+        .frame(minWidth: 150 * uiScale, alignment: .leading)
     }
 
     private func formatDuration(_ interval: TimeInterval) -> String {
@@ -132,6 +144,7 @@ struct SessionDot: View {
     let session: SessionState
     let size: CGFloat
     let isHovered: Bool
+    let uiScale: Double
 
     private let orbitRadius: CGFloat = 11
     private let satelliteSize: CGFloat = 3.5
@@ -139,7 +152,7 @@ struct SessionDot: View {
 
     var body: some View {
         let hasSub = !session.subagents.isEmpty
-        let container: CGFloat = 25
+        let container: CGFloat = 25 * uiScale
 
         ZStack {
             if session.status.pulses {
@@ -156,8 +169,8 @@ struct SessionDot: View {
                 SatelliteOrbit(
                     count: session.subagents.count,
                     color: Color.white.opacity(0.7),
-                    radius: orbitRadius,
-                    satelliteSize: satelliteSize,
+                    radius: orbitRadius * uiScale,
+                    satelliteSize: satelliteSize * uiScale,
                     period: period
                 )
             }
@@ -165,7 +178,7 @@ struct SessionDot: View {
         .frame(width: container, height: container)
         .scaleEffect(isHovered ? 1.18 : 1.0)
         .animation(.easeOut(duration: 0.16), value: isHovered)
-        .contentShape(Rectangle().inset(by: -3))
+        .contentShape(Rectangle().inset(by: -3 * uiScale))
     }
 }
 

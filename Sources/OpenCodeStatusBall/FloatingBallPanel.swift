@@ -14,7 +14,8 @@ final class FloatingBallPanel: NSPanel {
     private var hostingView: NSView?
 
     init<Content: View>(rootView: Content) {
-        let initial = NSRect(x: 0, y: 0, width: 120, height: 60)
+        let scale = StatusModel.shared.uiScale
+        let initial = NSRect(x: 0, y: 0, width: 120 * scale, height: 60 * scale)
         super.init(
             contentRect: initial,
             styleMask: [.nonactivatingPanel, .borderless, .fullSizeContentView],
