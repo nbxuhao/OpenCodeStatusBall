@@ -34,21 +34,24 @@ Sessions with active sub-agents show tiny white orbiting satellites around their
 
 ## Installation
 
+### 1. Install the App
+
+**Option A — Download pre-built**
+
+Download `OpenCodeStatusBall.zip` from the [releases](https://github.com/nbxuhao/OpenCodeStatusBall/releases), unzip and drag to `/Applications/`.
+
+**Option B — Build from source**
+
 ```bash
-git clone https://github.com/YOUR_USER/StatusBall.git
-cd StatusBall
-./launch/install.sh
+git clone https://github.com/nbxuhao/OpenCodeStatusBall.git
+cd OpenCodeStatusBall
+swift build -c release
+.build/release/OpenCodeStatusBall &
 ```
 
-This builds the release binary, installs a LaunchAgent to auto-start at login, and launches it immediately.
+### 2. Install the opencode Plugin
 
-### 安装 opencode 插件（配套必需）
-
-StatusBall 需要配合 opencode 插件才能显示会话状态。插件通过 Unix socket 向 App 推送实时状态。
-
-**方式一：npm 安装（推荐）**
-
-直接将插件作为 npm 包添加到 `opencode.json`，opencode 启动时自动安装：
+Add the plugin to your `opencode.json` (global or project-level):
 
 ```json
 {
@@ -56,55 +59,27 @@ StatusBall 需要配合 opencode 插件才能显示会话状态。插件通过 U
 }
 ```
 
-> ✅ 插件已发布到 npm：https://www.npmjs.com/package/opencode-status-ball
+> ✅ Published on npm: https://www.npmjs.com/package/opencode-status-ball
 
-**方式二：本地开发（file:// 协议）**
+opencode will automatically install the plugin via Bun at startup. No extra steps needed.
 
-在开发或测试时，可以使用 `file://` 协议直接加载本地文件：
+**Restart opencode** after adding the plugin entry.
 
-```json
-{
-  "plugin": [
-    "file:///Users/yourname/OpenCodeStatusBall/plugin"
-  ]
-}
-```
+### Verify
 
-> 路径指向包含 `package.json` 的目录。opencode 会自动加载并安装依赖。
+1. Launch OpenCodeStatusBall App
+2. Restart opencode
+3. Open a new session — a gray dot appears (idle)
+4. Start a conversation — dot turns green (running)
 
-**方式三：全局插件目录**
+### Troubleshooting
 
-将插件文件复制到全局插件目录，opencode 启动时自动加载：
-
-```bash
-# 复制插件到全局插件目录
-cp -r plugin ~/.config/opencode/plugins/opencode-status-ball
-
-# 重启 opencode
-```
-
-**验证安装**
-
-1. 确保 OpenCodeStatusBall App 已启动
-2. 重启 opencode
-3. 开启一个新会话，胶囊中应该出现一个灰色的 dot（idle 状态）
-4. 开始对话后变成绿色（running）
-
-**常见问题**
-
-| 问题 | 原因 | 解决方法 |
+| Issue | Cause | Fix |
 |---|---|---|
-| 没有 dots 出现 | App 未运行 | 先启动 OpenCodeStatusBall |
-| 插件加载报错 | 依赖未安装 | opencode 会自动安装 `@opencode-ai/plugin`，重启即可 |
-| 子 agent 卫星不显示 | 未收到子会话事件 | 确保 opencode 版本支持 `session.updated` 事件 |
-| 插件加载报错 | Bun 缓存了旧配置 | 重启 opencode（Bun 会缓存插件导入） |
-
-### Manual run (no auto-start)
-
-```bash
-swift build -c release
-.build/release/OpenCodeStatusBall &
-```
+| No dots appear | App not running | Launch OpenCodeStatusBall first |
+| Plugin load error | Missing dependency | opencode auto-installs `@opencode-ai/plugin`, restart opencode |
+| Sub-agent satellites not showing | Event not received | Ensure opencode version supports `session.updated` |
+| Plugin cached | Bun cached old config | Restart opencode |
 
 ## Uninstall
 
