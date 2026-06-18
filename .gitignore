@@ -1,6 +1,7 @@
 .build/
+.app/
+*.app/
+*.zip
 .DS_Store
 *.log
-.app/
-*.zip
 dist/

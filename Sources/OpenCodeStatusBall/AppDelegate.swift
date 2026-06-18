@@ -32,6 +32,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        panel?.close()
+        panel = nil
         StatusModel.shared.onUpdate = nil
         server.stop()
     }
