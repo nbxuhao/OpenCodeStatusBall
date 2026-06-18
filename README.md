@@ -56,7 +56,7 @@ StatusBall 需要配合 opencode 插件才能显示会话状态。插件通过 U
 }
 ```
 
-> ⚠️ 插件已发布到 npm，直接添加包名即可。如果未发布，请使用方式二。
+> ✅ 插件已发布到 npm：https://www.npmjs.com/package/opencode-status-ball
 
 **方式二：本地开发（file:// 协议）**
 
