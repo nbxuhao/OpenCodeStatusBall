@@ -36,11 +36,15 @@ Sessions with active sub-agents show tiny white orbiting satellites around their
 
 ### 1. Install the App
 
-**Option A — Download pre-built**
+**Option A — DMG (recommended)**
+
+Download `OpenCodeStatusBall.dmg` from the [releases](https://github.com/nbxuhao/OpenCodeStatusBall/releases), open it, and drag `OpenCodeStatusBall.app` to the `Applications` folder.
+
+**Option B — ZIP**
 
 Download `OpenCodeStatusBall.zip` from the [releases](https://github.com/nbxuhao/OpenCodeStatusBall/releases), unzip and drag to `/Applications/`.
 
-**Option B — Build from source**
+**Option C — Build from source**
 
 ```bash
 git clone https://github.com/nbxuhao/OpenCodeStatusBall.git
