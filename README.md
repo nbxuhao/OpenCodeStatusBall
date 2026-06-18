@@ -46,42 +46,41 @@ This builds the release binary, installs a LaunchAgent to auto-start at login, a
 
 StatusBall 需要配合 opencode 插件才能显示会话状态。插件通过 Unix socket 向 App 推送实时状态。
 
-**方式一：全局安装（推荐）**
+**方式一：npm 安装（推荐）**
+
+直接将插件作为 npm 包添加到 `opencode.json`，opencode 启动时自动安装：
+
+```json
+{
+  "plugin": ["opencode-status-ball"]
+}
+```
+
+> ⚠️ 插件已发布到 npm，直接添加包名即可。如果未发布，请使用方式二。
+
+**方式二：本地开发（file:// 协议）**
+
+在开发或测试时，可以使用 `file://` 协议直接加载本地文件：
+
+```json
+{
+  "plugin": [
+    "file:///Users/yourname/OpenCodeStatusBall/plugin"
+  ]
+}
+```
+
+> 路径指向包含 `package.json` 的目录。opencode 会自动加载并安装依赖。
+
+**方式三：全局插件目录**
 
 将插件文件复制到全局插件目录，opencode 启动时自动加载：
 
 ```bash
 # 复制插件到全局插件目录
-cp plugin/opencode-status-ball.ts ~/.config/opencode/plugins/
+cp -r plugin ~/.config/opencode/plugins/opencode-status-ball
 
 # 重启 opencode
-```
-
-插件会自动加载，**无需修改 `opencode.json`**。
-
-**方式二：项目级安装**
-
-将插件复制到项目目录，仅在当前项目生效：
-
-```bash
-mkdir -p .opencode/plugins
-cp plugin/opencode-status-ball.ts .opencode/plugins/
-```
-
-**方式三：发布为 npm 包**
-
-如果你想分享给其他人使用，可以将插件发布到 npm：
-
-```bash
-# 在插件目录创建 package.json
-cd plugin
-npm init -y
-npm publish
-
-# 然后在 opencode.json 中添加：
-# {
-#   "plugin": ["opencode-status-ball"]
-# }
 ```
 
 **验证安装**
@@ -96,7 +95,7 @@ npm publish
 | 问题 | 原因 | 解决方法 |
 |---|---|---|
 | 没有 dots 出现 | App 未运行 | 先启动 OpenCodeStatusBall |
-| dots 出现但无颜色变化 | 插件未正确加载 | 检查文件是否在 `~/.config/opencode/plugins/` 目录 |
+| 插件加载报错 | 依赖未安装 | opencode 会自动安装 `@opencode-ai/plugin`，重启即可 |
 | 子 agent 卫星不显示 | 未收到子会话事件 | 确保 opencode 版本支持 `session.updated` 事件 |
 | 插件加载报错 | Bun 缓存了旧配置 | 重启 opencode（Bun 会缓存插件导入） |
 

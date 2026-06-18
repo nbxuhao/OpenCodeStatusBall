@@ -1,0 +1,23 @@
+{
+  "name": "opencode-status-ball",
+  "version": "0.1.0",
+  "description": "A lightweight macOS floating indicator for opencode sessions",
+  "main": "opencode-status-ball.ts",
+  "type": "module",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "status",
+    "macos"
+  ],
+  "author": "nbxuhao",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nbxuhao/OpenCodeStatusBall.git",
+    "directory": "plugin"
+  },
+  "peerDependencies": {
+    "@opencode-ai/plugin": "latest"
+  }
+}
