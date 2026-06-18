@@ -33,20 +33,17 @@ final class SettingsWindowController {
 
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 320, height: 180),
-            styleMask: [.titled, .closable, .fullSizeContentView],
+            styleMask: [.borderless, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
-        window.title = "Settings"
         window.isReleasedWhenClosed = false
         window.center()
         window.contentView = windowContent
         window.level = .floating
         window.backgroundColor = NSColor.windowBackgroundColor
-
-        // Hide titlebar buttons (keep close)
-        window.standardWindowButton(.miniaturizeButton)?.isHidden = true
-        window.standardWindowButton(.zoomButton)?.isHidden = true
+        window.isMovable = true
+        window.isMovableByWindowBackground = true
 
         self.window = window
         window.makeKeyAndOrderFront(nil)
