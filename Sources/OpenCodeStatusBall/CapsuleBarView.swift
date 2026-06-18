@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct CapsuleBarView: View {
@@ -43,6 +44,11 @@ struct CapsuleBarView: View {
         )
         .fixedSize()
         .animation(.easeOut(duration: 0.18), value: model.sessions.map(\.id))
+        .contextMenu {
+            Button("Quit OpenCodeStatusBall") {
+                NSApplication.shared.terminate(nil)
+            }
+        }
     }
 }
 
